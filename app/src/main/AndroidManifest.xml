@@ -34,6 +34,11 @@
                 android:resource="@xml/searchable"/>
         </activity>
 
+        <activity android:name=".SearchActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
         <provider
             android:authorities="com.example.weatherdemo.util.HistorySearchSuggestionsProvider"
             android:name=".util.HistorySearchSuggestionsProvider"></provider>

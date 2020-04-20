@@ -30,6 +30,7 @@ import com.example.weatherdemo.databinding.ActivityMainBinding
 import com.example.weatherdemo.util.HistorySearchAdapter
 import com.example.weatherdemo.util.HistorySearchSuggestionsProvider
 import com.example.weatherdemo.util.OnHistoryDeleteClickListener
+import com.example.weatherdemo.util.OnItemClick
 import com.example.weatherdemo.viewmodel.WeatherViewModel
 import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
 import dagger.android.support.DaggerAppCompatActivity
@@ -44,7 +45,6 @@ import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-
 
 class MainActivity : DaggerAppCompatActivity() {
 
@@ -62,6 +62,8 @@ class MainActivity : DaggerAppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
 
     private val REQUEST_CHECK_SETTINGS = 0x1
+
+    private val REQUEST_CITY_NAME = 0x2
 
     private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
 
@@ -166,6 +168,15 @@ class MainActivity : DaggerAppCompatActivity() {
                     Timber.i("User chose not to make required location settings changes.")
                 }
             }
+            REQUEST_CITY_NAME -> when (resultCode) {
+                Activity.RESULT_OK -> {
+                    val city = data?.getStringExtra("city")
+                    weatherViewModel.getWeatherByCityName(city)
+                }
+                Activity.RESULT_CANCELED -> {
+                    Timber.i("User chose not to make required location settings changes.")
+                }
+            }
         }
     }
 
@@ -253,6 +264,13 @@ class MainActivity : DaggerAppCompatActivity() {
                 this.onBackPressed()
                 true
             }
+
+            R.id.activity_search -> {
+                val intent = Intent(this, SearchActivity::class.java)
+                startActivityForResult(intent, REQUEST_CITY_NAME)
+                true
+            }
+
             R.id.location_search -> {
                 if (checkPermissions()) {
                     startLocationUpdates()

@@ -15,10 +15,35 @@ interface WeatherDao {
     fun loadWeather(): LiveData<WeatherResponse>
 }
 
-@Database(entities = [WeatherResponse::class, WeatherInfo::class, MainData::class, Clouds::class, Wind::class, Sys::class, City::class, Coord::class], version = 1, exportSchema = false)
+@Dao
+interface SearchDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSearchItem(searchHistoryItem: SearchHistoryItem)
+
+    @Query("select * from item_table")
+    fun loadSearchHistory(): LiveData<List<SearchHistoryItem>>
+
+    @Query("update item_table set checked = :checked where name = :city")
+    fun updateSearchItem(city: String, checked: Boolean)
+
+    @Query("update item_table set checked = :checked")
+    fun updateSearchItemUnchecked(checked: Boolean)
+
+    @Query("delete from item_table where name = :city")
+    fun deleteCityByName(city: String)
+
+    @Query("delete from item_table where checked = :checked")
+    fun deleteCheckedCity(checked: Boolean)
+
+    @Query("delete from item_table")
+    fun deleteall()
+}
+
+@Database(entities = [WeatherResponse::class, WeatherInfo::class, MainData::class, Clouds::class, Wind::class, Sys::class, City::class, Coord::class, SearchHistoryItem::class], version = 1, exportSchema = false)
 @TypeConverters(ListDataConverter::class)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
+    abstract val searchDao: SearchDao
 }
 
 private lateinit var INSTANCE: WeatherDatabase

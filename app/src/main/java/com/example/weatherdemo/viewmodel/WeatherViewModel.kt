@@ -9,6 +9,7 @@ import com.example.weatherdemo.data.model.WeatherResponse
 import com.example.weatherdemo.db.WeatherDao
 import com.example.weatherdemo.util.CoroutineContextProvider
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class WeatherViewModel @Inject constructor(
         return launchDataLoad {
             withContext(contextProvider.IO) {
                 var weatherResponse = weatherRepository.getWeatherByCityName(name)
-                if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod.equals("200")) {
+                if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
             }
@@ -50,11 +51,9 @@ class WeatherViewModel @Inject constructor(
     fun getWeatherByZipCode(name: String?) {
 
         return launchDataLoad {
-            var weatherResponse = withContext(contextProvider.IO) {
-                weatherRepository.getWeatherByZipCode(name)
-            }
-            if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod.equals("200")) {
-                withContext(contextProvider.IO) {
+            withContext(contextProvider.IO) {
+                var weatherResponse = weatherRepository.getWeatherByZipCode(name)
+                if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
             }
@@ -64,11 +63,9 @@ class WeatherViewModel @Inject constructor(
     fun getWeatherByCoordinates(lat: Float?, lon: Float?) {
 
         return launchDataLoad {
-            var weatherResponse = withContext(contextProvider.IO) {
-                weatherRepository.getWeatherByCoordinates(lat, lon)
-            }
-            if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod.equals("200")) {
-                withContext(contextProvider.IO) {
+            withContext(contextProvider.IO) {
+                var weatherResponse = weatherRepository.getWeatherByCoordinates(lat, lon)
+                if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
             }

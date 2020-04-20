@@ -11,6 +11,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/activity_search"
+        android:title="@string/search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/location_search"
         android:title="@string/location"
         android:icon="@android:drawable/ic_menu_mylocation"
