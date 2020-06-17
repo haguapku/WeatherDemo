@@ -1,5 +1,6 @@
 package com.example.weatherdemo.data.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

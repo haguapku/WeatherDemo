@@ -18,13 +18,13 @@ const val BASE_URL = "http://api.openweathermap.org"
 
 interface WeatherService {
 
-    @GET("http://api.openweathermap.org/data/2.5/forecast?APPID=" + BuildConfig.API_KEY)
+    @GET("http://api.openweathermap.org/data/2.5/forecast/daily?cnt=8&units=metric&APPID=" + BuildConfig.API_KEY)
     suspend fun getWeatherByCityName(@Query("q") q: String?): Response<WeatherResponse>
 
-    @GET("http://api.openweathermap.org/data/2.5/forecast?APPID=" + BuildConfig.API_KEY)
+    @GET("http://api.openweathermap.org/data/2.5/forecast/daily?cnt=8&units=metric&APPID=" + BuildConfig.API_KEY)
     suspend fun getWeatherByZipCode(@Query("zip") zip: String?): Response<WeatherResponse>
 
-    @GET("http://api.openweathermap.org/data/2.5/forecast?APPID=" + BuildConfig.API_KEY)
+    @GET("http://api.openweathermap.org/data/2.5/forecast/daily?cnt=8&units=metric&APPID=" + BuildConfig.API_KEY)
     suspend fun getWeatherByCoordinates(@Query("lat") lat: Float?, @Query("lon") lon: Float?): Response<WeatherResponse>
 
     companion object {

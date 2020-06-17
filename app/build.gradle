@@ -81,6 +81,13 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpMockWebServerVersion"
 
+    // Glide dependency
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+
+    // Joda time
+    implementation 'joda-time:joda-time:2.10.5'
+
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"

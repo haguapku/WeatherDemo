@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="margin">20dp</dimen>
+    <dimen name="margin_20">20dp</dimen>
+    <dimen name="margin_10">10dp</dimen>
+    <dimen name="margin_5">5dp</dimen>
     <dimen name="title_font_size">18sp</dimen>
+    <dimen name="temp_big_size">24sp</dimen>
+    <dimen name="temp_medium_size">16sp</dimen>
+    <dimen name="temp_small_size">10sp</dimen>
 </resources>

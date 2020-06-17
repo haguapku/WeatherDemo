@@ -2,58 +2,54 @@ package com.example.weatherdemo
 
 import android.Manifest
 import android.app.Activity
-import android.app.SearchManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
-import android.provider.SearchRecentSuggestions
 import android.provider.Settings
-import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherdemo.databinding.ActivityMainBinding
-import com.example.weatherdemo.util.HistorySearchAdapter
-import com.example.weatherdemo.util.HistorySearchSuggestionsProvider
-import com.example.weatherdemo.util.OnHistoryDeleteClickListener
-import com.example.weatherdemo.util.OnItemClick
+import com.example.weatherdemo.ui.WeeklyWeatherAdapter
 import com.example.weatherdemo.viewmodel.WeatherViewModel
 import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
-import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
-import javax.inject.Inject
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.bottom_sheet_layout.*
 import timber.log.Timber
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var factory: WeatherViewModelFactory
 
-    private lateinit var weatherViewModel: WeatherViewModel
+    @Inject
+    lateinit var weeklyWeatherAdapter: WeeklyWeatherAdapter
 
-    private lateinit var searchView: SearchView
+    private lateinit var weatherViewModel: WeatherViewModel
 
     private lateinit var textView: TextView
 
@@ -77,11 +73,11 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private lateinit var mLocationCallback: LocationCallback
 
-    private lateinit var mCurrentLocation: Location
+    private var mCurrentLocation: Location? = null
 
-    private lateinit var mSuggestionAdapter: HistorySearchAdapter
+    private var mCurrentCityName: String? = null
 
-    private lateinit var suggestions: SearchRecentSuggestions
+    private var mCurrentCountry: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +86,23 @@ class MainActivity : DaggerAppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(p0: View, p1: Float) {
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+
+                    }
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
+
+                    }
+                }
+            }
+        })
+
         weatherViewModel = ViewModelProviders.of(this, factory).get(WeatherViewModel::class.java)
 
         weatherViewModel.weatherLivaData.observe(this,
@@ -97,9 +110,17 @@ class MainActivity : DaggerAppCompatActivity() {
             t?.let {
                 supportActionBar!!.title = t.city.name
                 binding.cityInfo = t.city
-                binding.mainData = t.list[0].main
-                binding.windInfo = t.list[0].wind
-                binding.cloudsInfo = t.list[0].clouds
+                binding.weatherInfo = t.list[0]
+                weeklyWeatherAdapter.setWeatherInfos(t.list)
+                swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
+                if (!mCurrentCountry.equals(t.city.country)) {
+                    mCurrentCountry = t.city.country
+                    val sharedPref = this@MainActivity.getPreferences(Context.MODE_PRIVATE) ?: return@Observer
+                    with (sharedPref.edit())  {
+                        putString(getString(R.string.current_country), t.city.country)
+                        commit()
+                    }
+                }
             }
         })
 
@@ -107,8 +128,18 @@ class MainActivity : DaggerAppCompatActivity() {
             text?.let {
                 Snackbar.make(rootLayout, it, Snackbar.LENGTH_SHORT).show()
                 weatherViewModel.onSnackbarShown()
+                swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
             }
         })
+
+        weekly_weather.layoutManager = LinearLayoutManager(this)
+        weekly_weather.adapter = weeklyWeatherAdapter
+        weekly_weather.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSettingsClient = LocationServices.getSettingsClient(this)
@@ -117,7 +148,31 @@ class MainActivity : DaggerAppCompatActivity() {
         createLocationRequest()
         buildLocationSettingsRequest()
 
-        mSuggestionAdapter = HistorySearchAdapter(this, R.layout.item_search_history_list, null)
+        // Setup pull down refreshing
+        swipeRefreshLayout.setOnRefreshListener {
+            update()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        update()
+    }
+
+    private fun update() {
+        val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
+        mCurrentCityName = sharedPref.getString(getString(R.string.current_city), null)
+        mCurrentCountry = sharedPref.getString(getString(R.string.current_country), null)
+        if (mCurrentCityName != null) {
+            swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
+            weatherViewModel.getWeatherByCityName("$mCurrentCityName,$mCurrentCountry")
+        } else {
+            if (checkPermissions()) {
+                startLocationUpdates()
+            } else if (!checkPermissions()) {
+                requestPermissions()
+            }
+        }
     }
 
     private fun createLocationRequest() {
@@ -143,7 +198,13 @@ class MainActivity : DaggerAppCompatActivity() {
                     textView.text = "No loaction data"
                 }
                 mCurrentLocation?.run {
-                    weatherViewModel.getWeatherByCoordinates(mCurrentLocation.latitude.toFloat(), mCurrentLocation.longitude.toFloat())
+                    swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
+                    weatherViewModel.getWeatherByCoordinates(mCurrentLocation!!.latitude.toFloat(), mCurrentLocation!!.longitude.toFloat())
+                    val sharedPref = this@MainActivity.getPreferences(Context.MODE_PRIVATE) ?: return
+                    with (sharedPref.edit()) {
+                        putString(getString(R.string.current_city), null)
+                        commit()
+                    }
                 }
 
             }
@@ -170,8 +231,13 @@ class MainActivity : DaggerAppCompatActivity() {
             }
             REQUEST_CITY_NAME -> when (resultCode) {
                 Activity.RESULT_OK -> {
-                    val city = data?.getStringExtra("city")
-                    weatherViewModel.getWeatherByCityName(city)
+                    mCurrentCityName = data?.getStringExtra("city")
+                    val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
+                    with (sharedPref.edit()) {
+                        putString(getString(R.string.current_city), mCurrentCityName)
+                        commit()
+                    }
+                    weatherViewModel.getWeatherByCityName("$mCurrentCityName,$mCurrentCountry")
                 }
                 Activity.RESULT_CANCELED -> {
                     Timber.i("User chose not to make required location settings changes.")
@@ -183,79 +249,7 @@ class MainActivity : DaggerAppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu_main, menu)
-        val searchMenuItem = menu!!.findItem(R.id.action_search)
-        searchView = searchMenuItem.actionView as SearchView
-
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-
-        suggestions = SearchRecentSuggestions(this,
-            HistorySearchSuggestionsProvider.AUTHORITY, HistorySearchSuggestionsProvider.MODE)
-
-        mSuggestionAdapter.setListener(object : OnHistoryDeleteClickListener {
-            override fun onItemClick(query: String) {
-                suggestions.clearHistory()
-                val cursor = getRecentSuggestions("")
-                cursor?.let {
-                    mSuggestionAdapter.swapCursor(cursor)
-                }
-                searchView.onActionViewCollapsed()
-//                val deleteSuccess = deleteSuggestions(query)
-//                if(deleteSuccess == -1){
-//                    Toast.makeText(this@MainActivity,"Delete failed",Toast.LENGTH_SHORT).show()
-//                }else{
-//                    Toast.makeText(this@MainActivity,"Delete succeeded",Toast.LENGTH_SHORT).show()
-//                }
-            }
-        })
-
-        searchView.apply {
-            setSearchableInfo(searchManager.getSearchableInfo(componentName))
-            suggestionsAdapter = mSuggestionAdapter
-            setOnSearchClickListener {
-                val cursor = getRecentSuggestions("")
-                cursor?.let {
-                    mSuggestionAdapter.swapCursor(cursor)
-                }
-            }
-            setOnQueryTextListener(object :SearchView.OnQueryTextListener{
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    if (TextUtils.isEmpty(query)) return false
-                    suggestions.saveRecentQuery(query, null)
-                    if (hasNumeric(query!!)) {
-                        weatherViewModel.getWeatherByZipCode(query)
-                    } else {
-                        weatherViewModel.getWeatherByCityName(query)
-                    }
-                    searchView.onActionViewCollapsed()
-                    return false
-                }
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    val cursor = getRecentSuggestions(newText!!)
-                    cursor?.let {
-                        mSuggestionAdapter.swapCursor(cursor)
-                    }
-                    return false
-                }
-            })
-            setOnSuggestionListener(object :SearchView.OnSuggestionListener {
-                override fun onSuggestionSelect(position: Int): Boolean {
-                    return false
-                }
-
-                override fun onSuggestionClick(position: Int): Boolean {
-                    val str = mSuggestionAdapter!!.getSuggestionText(position)
-                    if (hasNumeric(str!!)) {
-                        weatherViewModel.getWeatherByZipCode(str)
-                    } else {
-                        weatherViewModel.getWeatherByCityName(str)
-                    }
-                    searchView.onActionViewCollapsed()
-                    return true
-                }
-            })
-            return true
-        }
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -341,11 +335,11 @@ class MainActivity : DaggerAppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if(grantResults.size == 0) {
+        if(grantResults.isEmpty()) {
             return
         }
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.size <= 0) {
+            if (grantResults.isEmpty()) {
                 Timber.i("User interaction was cancelled.")
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Permission granted, updates requested, starting location updates")
@@ -373,6 +367,15 @@ class MainActivity : DaggerAppCompatActivity() {
         mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
             .addOnSuccessListener(this, OnSuccessListener<LocationSettingsResponse> {
                 Timber.i("All location settings are satisfied.")
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                }
                 mFusedLocationClient.requestLocationUpdates(
                     mLocationRequest,
                     mLocationCallback, Looper.myLooper()
@@ -404,32 +407,6 @@ class MainActivity : DaggerAppCompatActivity() {
                 }
             })
     }
-
-    fun deleteSuggestions(id:String): Int? {
-        val uriBuilder = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_CONTENT)
-            .authority(HistorySearchSuggestionsProvider.AUTHORITY)
-
-        uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
-        val uri = uriBuilder.build()
-        return  contentResolver.delete(uri,"_id=$id",null)
-    }
-
-    fun getRecentSuggestions(query: String): Cursor? {
-        val uriBuilder = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_CONTENT)
-            .authority(HistorySearchSuggestionsProvider.AUTHORITY)
-
-        uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
-
-        val selection = " ?"
-        val selArgs = arrayOf(query)
-
-        val uri = uriBuilder.build()
-
-        return contentResolver.query(uri, null, selection, selArgs, null)
-    }
-
 
     private fun hasNumeric(str: String): Boolean {
         val pattern = Pattern.compile("-?[0-9]+\\.?[0-9]*")

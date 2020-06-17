@@ -13,9 +13,7 @@ data class City(
     val coord: Coord,
     val country: String,
     val population: Int,
-    val timezone: Int,
-    val sunrise: Long,
-    val sunset: Long)
+    val timezone: Int)
 {
     @PrimaryKey(autoGenerate = false)
     var cityid: Int = 0

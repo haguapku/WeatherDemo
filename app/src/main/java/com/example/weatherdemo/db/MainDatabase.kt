@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.weatherdemo.data.model.*
-import com.example.weatherdemo.util.ListDataConverter
+import com.example.weatherdemo.util.WeatherInfoListDataConverter
+import com.example.weatherdemo.util.WeatherListDataConverter
 
 @Dao
 interface WeatherDao {
@@ -39,8 +40,8 @@ interface SearchDao {
     fun deleteall()
 }
 
-@Database(entities = [WeatherResponse::class, WeatherInfo::class, MainData::class, Clouds::class, Wind::class, Sys::class, City::class, Coord::class, SearchHistoryItem::class], version = 1, exportSchema = false)
-@TypeConverters(ListDataConverter::class)
+@Database(entities = [WeatherResponse::class, WeatherInfo::class, City::class, Coord::class, SearchHistoryItem::class], version = 1, exportSchema = false)
+@TypeConverters(WeatherInfoListDataConverter::class, WeatherListDataConverter::class)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
     abstract val searchDao: SearchDao

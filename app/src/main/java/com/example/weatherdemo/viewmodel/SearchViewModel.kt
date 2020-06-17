@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
-    val searchDao: SearchDao,
+    private val searchDao: SearchDao,
     private val contextProvider: CoroutineContextProvider
 ): ViewModel() {
 

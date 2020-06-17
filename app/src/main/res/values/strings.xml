@@ -2,7 +2,7 @@
     <string name="app_name">WeatherDemo</string>
 
     <string name="search">Search</string>
-    <string name="search_hint">City name or zip code</string>
+    <string name="search_hint">Search by name or postcode</string>
     <string name="location">Location</string>
 
     <string name="permission_rationale">Location permission is needed</string>
@@ -16,4 +16,12 @@
     <string name="humidity">Humidity</string>
     <string name="wind">Wind</string>
     <string name="cloud">Clouds</string>
+    <string name="current_city">currentCity</string>
+    <string name="current_country">currentCountry</string>
+
+    <string name="ddMM_format">dd/MM</string>
+    <string name="today">Today</string>
+    <string name="updated">Updated</string>
+    <string name="delete">delete</string>
+    <string name="cancel">cancel</string>
 </resources>

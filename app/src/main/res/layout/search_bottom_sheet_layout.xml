@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/searchbottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="90dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <LinearLayout
+        android:id="@+id/ll_delete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/ll_cancel"
+        android:gravity="center"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/deleteSelectedItems"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_5"
+            android:layout_marginTop="@dimen/margin_10"
+            android:src="@drawable/ic_delete"/>
+        <TextView
+            android:id="@+id/text_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_10"
+            android:layout_marginTop="@dimen/margin_5"
+            android:textSize="@dimen/temp_small_size"
+            android:text="@string/delete"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/ll_delete"
+        app:layout_constraintRight_toRightOf="parent"
+        android:gravity="center"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/cancelAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_5"
+            android:layout_marginTop="@dimen/margin_10"
+            android:src="@drawable/ic_cancel"/>
+        <TextView
+            android:id="@+id/text_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_10"
+            android:layout_marginTop="@dimen/margin_5"
+            android:textSize="@dimen/temp_small_size"
+            android:text="@string/cancel"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

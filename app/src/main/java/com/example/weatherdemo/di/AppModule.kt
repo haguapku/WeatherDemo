@@ -5,6 +5,7 @@ import com.example.weatherdemo.api.WeatherService
 import com.example.weatherdemo.db.SearchDao
 import com.example.weatherdemo.db.WeatherDao
 import com.example.weatherdemo.db.getDatabase
+import com.example.weatherdemo.ui.WeeklyWeatherAdapter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -23,4 +24,8 @@ class AppModule {
     @Provides
     @Singleton
     fun getSearchrDao(): SearchDao = getDatabase(WeatherApplication.instance).searchDao
+
+    @Provides
+    @Singleton
+    fun getWeeklyWeatherAdapter(): WeeklyWeatherAdapter = WeeklyWeatherAdapter(ArrayList())
 }
