@@ -40,7 +40,7 @@ interface SearchDao {
     fun deleteall()
 }
 
-@Database(entities = [WeatherResponse::class, WeatherInfo::class, City::class, Coord::class, SearchHistoryItem::class], version = 1, exportSchema = false)
+@Database(entities = [WeatherResponse::class, WeatherInfo::class, City::class, Coord::class, SearchHistoryItem::class], version = 2, exportSchema = false)
 @TypeConverters(WeatherInfoListDataConverter::class, WeatherListDataConverter::class)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao

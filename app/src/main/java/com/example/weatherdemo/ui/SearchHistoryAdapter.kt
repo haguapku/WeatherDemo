@@ -1,49 +1,56 @@
 package com.example.weatherdemo.ui
 
-import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherdemo.R
+import com.example.weatherdemo.api.WeatherService
 import com.example.weatherdemo.data.model.SearchHistoryItem
+import com.example.weatherdemo.data.model.WeatherResponse
+import com.example.weatherdemo.databinding.ItemSearchHistoryBinding
 import com.example.weatherdemo.util.OnItemClick
 import com.example.weatherdemo.util.OnItemLongClick
-import timber.log.Timber
+import dagger.hilt.android.scopes.ActivityScoped
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class SearchHistoryAdapter internal constructor(
-    context: Context
-) : RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryItemViewHolder>() {
+@ActivityScoped
+class SearchHistoryAdapter @Inject constructor(private val weatherService: WeatherService): RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryItemViewHolder>() {
 
     private lateinit var onItemClick: OnItemClick
-    private lateinit var onItemlLongClick: OnItemLongClick
+    private lateinit var onItemLongClick: OnItemLongClick
 
     var selected = false
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var cities = emptyList<SearchHistoryItem>()
 
-    inner class SearchHistoryItemViewHolder(itemView: View, private val onItemClick: OnItemClick)
-        : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
+    private val compositeDisposable = CompositeDisposable()
+
+    inner class SearchHistoryItemViewHolder(private val itemSearchHistoryBinding: ItemSearchHistoryBinding, private val onItemClick: OnItemClick)
+        : RecyclerView.ViewHolder(itemSearchHistoryBinding.root), View.OnClickListener, View.OnLongClickListener {
 
         init {
-            itemView.findViewById<TextView>(R.id.textView)?.apply {
+            itemSearchHistoryBinding.root.findViewById<ConstraintLayout>(R.id.cl_search)?.apply {
                 setOnClickListener(this@SearchHistoryItemViewHolder)
                 setOnLongClickListener(this@SearchHistoryItemViewHolder)
             }
         }
 
-        val searchHistoryItemView: TextView = itemView.findViewById(R.id.textView)
-
-        val searchRelativeLayout: RelativeLayout = itemView.findViewById(R.id.rl_search)
+        fun bind(searchHistoryItem: SearchHistoryItem) {
+            itemSearchHistoryBinding.searchItem = searchHistoryItem
+            itemSearchHistoryBinding.executePendingBindings()
+        }
 
         override fun onClick(view: View?) {
             view?.let {
                 if (selected) {
-                    onItemlLongClick.onItemLongClick(view, adapterPosition)
+                    onItemLongClick.onItemLongClick(view, adapterPosition)
                 } else {
                     onItemClick.onItemClick(view, adapterPosition)
                 }
@@ -60,18 +67,33 @@ class SearchHistoryAdapter internal constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
             : SearchHistoryItemViewHolder {
-        val itemView = inflater.inflate(R.layout.recyclerview_item, parent, false)
-        return SearchHistoryItemViewHolder(itemView, onItemClick)
+        return SearchHistoryItemViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_search_history, parent, false), onItemClick)
     }
 
     override fun onBindViewHolder(holder: SearchHistoryItemViewHolder, position: Int) {
-        val current = cities[position]
-        holder.searchHistoryItemView.apply {
-            text = current.name
-        }
-        holder.searchRelativeLayout.apply {
-            setBackgroundColor(if (current.checked) Color.GRAY else Color.TRANSPARENT)
-        }
+        var city = cities[position]
+        compositeDisposable.add(
+            weatherService.getWeatherByCityNameRx(cities[position].name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<WeatherResponse>(){
+                    override fun onSuccess(t: WeatherResponse) {
+                        city.detail = t.list[0].weather[0].description
+                        city.icon = t.list[0].weather[0].icon
+                        city.temp = t.list[0].temp.day
+                        holder.bind(city)
+                    }
+
+                    override fun onError(e: Throwable) {
+                        holder.bind(city)
+                    }
+                })
+        )
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        compositeDisposable.clear()
+        super.onDetachedFromRecyclerView(recyclerView)
     }
 
     internal fun setCities(cities: List<SearchHistoryItem>) {
@@ -86,6 +108,6 @@ class SearchHistoryAdapter internal constructor(
     }
 
     fun setOnItemLongClick(onItemLongClick: OnItemLongClick) {
-        this.onItemlLongClick = onItemLongClick
+        this.onItemLongClick = onItemLongClick
     }
 }

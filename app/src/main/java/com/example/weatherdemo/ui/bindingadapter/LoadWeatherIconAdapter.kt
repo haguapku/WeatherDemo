@@ -10,7 +10,7 @@ class LoadWeatherIconAdapter {
         @JvmStatic
         @BindingAdapter("weatherIcon")
         fun loadWeatherIcon(imageView: ImageView, imageUrl: String) {
-            Glide.with(imageView.context).load(imageUrl).into(imageView)
+            Glide.with(imageView.context.applicationContext).load(imageUrl).into(imageView)
         }
     }
 }

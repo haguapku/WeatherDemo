@@ -3,9 +3,9 @@ package com.example.weatherdemo
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -31,18 +31,14 @@ import javax.inject.Inject
 class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
 
     @Inject
-    lateinit var factory: WeatherViewModelFactory
-
-    private lateinit var weatherViewModel: WeatherViewModel
+    lateinit var searchFactory: SearchViewModelFactory
 
     @Inject
-    lateinit var searchFactory: SearchViewModelFactory
+    lateinit var searchHistoryAdapter: SearchHistoryAdapter
 
     private lateinit var searchViewModel: SearchViewModel
 
     private lateinit var cities: List<SearchHistoryItem>
-
-    private lateinit var adapter: SearchHistoryAdapter
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
@@ -83,10 +79,9 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.searchHistory)
-        adapter = SearchHistoryAdapter(this)
-        recyclerView.adapter = adapter
-        adapter.setOnItemClick(this)
-        adapter.setOnItemLongClick(this)
+        recyclerView.adapter = searchHistoryAdapter
+        searchHistoryAdapter.setOnItemClick(this)
+        searchHistoryAdapter.setOnItemLongClick(this)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -100,21 +95,16 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
         searchViewModel.searchHistoryLivaData.observe(this, Observer {
             t ->
             t?.let {
-                cities = it
-                adapter.setCities(t)
+                if (!this.isFinishing || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && this.isDestroyed)) {
+                    cities = it
+                    searchHistoryAdapter.setCities(t)
+                }
             }
         })
 
-        weatherViewModel = ViewModelProviders.of(this, factory).get(WeatherViewModel::class.java)
-
-        weatherViewModel.weatherLivaData.observe(this,
-            Observer { t -> t?.let {
-
-            }})
-
         deleteSelectedItems.setOnClickListener {
             searchViewModel.delete(true)
-            adapter.selected = false
+            searchHistoryAdapter.selected = false
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
@@ -133,7 +123,7 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
 
     override fun onItemClick(view: View, position: Int) {
         when (view) {
-            is TextView -> {
+            is ConstraintLayout -> {
                 val city = cities[position].name
                 setResult(Activity.RESULT_OK, Intent().putExtra("city", city))
                 finish()
@@ -165,7 +155,7 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
+        searchHistoryAdapter.selected = false
         searchViewModel.update(false)
-        adapter.selected = false
     }
 }

@@ -3,6 +3,7 @@ package com.example.weatherdemo.api
 import com.example.weatherdemo.BuildConfig
 import com.example.weatherdemo.WeatherApplication
 import com.example.weatherdemo.data.model.WeatherResponse
+import io.reactivex.Single
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -26,6 +27,9 @@ interface WeatherService {
 
     @GET("http://api.openweathermap.org/data/2.5/forecast/daily?cnt=8&units=metric&APPID=" + BuildConfig.API_KEY)
     suspend fun getWeatherByCoordinates(@Query("lat") lat: Float?, @Query("lon") lon: Float?): Response<WeatherResponse>
+
+    @GET("http://api.openweathermap.org/data/2.5/forecast/daily?cnt=8&units=metric&APPID=" + BuildConfig.API_KEY)
+    fun getWeatherByCityNameRx(@Query("q") q: String?) :Single<WeatherResponse>
 
     companion object {
         fun create(): WeatherService = Retrofit.Builder()

@@ -49,5 +49,7 @@ class WeatherRepository @Inject constructor(
         }
     }
 
+    fun getWeatherByCityNameRx(name: String?): Single<WeatherResponse> = weatherService.getWeatherByCityNameRx(name)
+
     class WeatherRefreshError(cause: Throwable) : Throwable(cause.message, cause)
 }
