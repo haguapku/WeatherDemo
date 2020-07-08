@@ -8,7 +8,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,15 +21,14 @@ import com.example.weatherdemo.util.OnItemClick
 import com.example.weatherdemo.util.OnItemLongClick
 import com.example.weatherdemo.viewmodel.SearchViewModel
 import com.example.weatherdemo.viewmodel.SearchViewModelFactory
-import com.example.weatherdemo.viewmodel.WeatherViewModel
-import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.search_bottom_sheet_layout.*
 import kotlinx.android.synthetic.main.search_layout.*
 import javax.inject.Inject
 
-class SearchActivity: DaggerAppCompatActivity(), OnItemClick, OnItemLongClick {
+@AndroidEntryPoint
+class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
 
     @Inject
     lateinit var factory: WeatherViewModelFactory

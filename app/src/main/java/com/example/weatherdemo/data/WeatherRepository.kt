@@ -2,15 +2,16 @@ package com.example.weatherdemo.data
 
 import com.example.weatherdemo.api.WeatherService
 import com.example.weatherdemo.data.model.WeatherResponse
+import dagger.hilt.android.scopes.ActivityScoped
+import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@ActivityScoped
 class WeatherRepository @Inject constructor(
-    val weatherService: WeatherService) {
+    private val weatherService: WeatherService) {
 
     suspend fun getWeatherByCityName(name: String?): Response<WeatherResponse> {
         return withContext(Dispatchers.IO) {

@@ -8,9 +8,12 @@ import com.example.weatherdemo.viewmodel.WeatherViewModel
 import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
 import dagger.Binds
 import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 import dagger.multibindings.IntoMap
 
 @Module
+@InstallIn(ActivityComponent::class)
 abstract class ViewModelModule {
 
     @Binds
@@ -24,7 +27,7 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(SearchViewModel::class)
-    internal abstract fun bindSearchViewModel(searchViewModle: SearchViewModel): ViewModel
+    internal abstract fun bindSearchViewModel(searchViewModel: SearchViewModel): ViewModel
 
     @Binds
     internal abstract fun bindSearchViewModelFactory(searchViewModelFactory: SearchViewModelFactory): ViewModelProvider.Factory

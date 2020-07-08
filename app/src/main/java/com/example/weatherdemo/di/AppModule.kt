@@ -8,24 +8,28 @@ import com.example.weatherdemo.db.getDatabase
 import com.example.weatherdemo.ui.WeeklyWeatherAdapter
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
+@InstallIn(ActivityComponent::class)
 class AppModule {
 
     @Provides
-    @Singleton
+    @ActivityScoped
     fun getWeatherService(): WeatherService = WeatherService.create()
 
     @Provides
-    @Singleton
+    @ActivityScoped
     fun getWeatherDao(): WeatherDao = getDatabase(WeatherApplication.instance).weatherDao
 
     @Provides
-    @Singleton
-    fun getSearchrDao(): SearchDao = getDatabase(WeatherApplication.instance).searchDao
+    @ActivityScoped
+    fun getSearchDao(): SearchDao = getDatabase(WeatherApplication.instance).searchDao
 
     @Provides
-    @Singleton
+    @ActivityScoped
     fun getWeeklyWeatherAdapter(): WeeklyWeatherAdapter = WeeklyWeatherAdapter(ArrayList())
+
 }
