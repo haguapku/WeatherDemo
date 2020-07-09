@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +20,6 @@ import com.example.weatherdemo.ui.SearchHistoryAdapter
 import com.example.weatherdemo.util.OnItemClick
 import com.example.weatherdemo.util.OnItemLongClick
 import com.example.weatherdemo.viewmodel.SearchViewModel
-import com.example.weatherdemo.viewmodel.SearchViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.search_bottom_sheet_layout.*
@@ -31,12 +30,9 @@ import javax.inject.Inject
 class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
 
     @Inject
-    lateinit var searchFactory: SearchViewModelFactory
-
-    @Inject
     lateinit var searchHistoryAdapter: SearchHistoryAdapter
 
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModels()
 
     private lateinit var cities: List<SearchHistoryItem>
 
@@ -72,7 +68,7 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
             false
         }
 
-        search_text.setOnFocusChangeListener { view, hasFocus ->
+        search_text.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 resetCheckedStates()
             }
@@ -89,8 +85,6 @@ class SearchActivity: AppCompatActivity(), OnItemClick, OnItemLongClick {
                 DividerItemDecoration.VERTICAL
             )
         )
-
-        searchViewModel = ViewModelProviders.of(this, searchFactory).get(SearchViewModel::class.java)
 
         searchViewModel.searchHistoryLivaData.observe(this, Observer {
             t ->

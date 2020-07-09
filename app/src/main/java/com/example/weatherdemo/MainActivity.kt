@@ -16,17 +16,16 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherdemo.databinding.ActivityMainBinding
 import com.example.weatherdemo.ui.WeeklyWeatherAdapter
 import com.example.weatherdemo.viewmodel.WeatherViewModel
-import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -46,12 +45,9 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var factory: WeatherViewModelFactory
-
-    @Inject
     lateinit var weeklyWeatherAdapter: WeeklyWeatherAdapter
 
-    private lateinit var weatherViewModel: WeatherViewModel
+    private val weatherViewModel: WeatherViewModel by viewModels()
 
     private lateinit var textView: TextView
 
@@ -104,8 +100,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
-        weatherViewModel = ViewModelProviders.of(this, factory).get(WeatherViewModel::class.java)
 
         weatherViewModel.weatherLivaData.observe(this,
         Observer { t ->

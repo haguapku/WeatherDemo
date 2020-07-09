@@ -1,5 +1,6 @@
 package com.example.weatherdemo.viewmodel
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +9,8 @@ import com.example.weatherdemo.db.SearchDao
 import com.example.weatherdemo.util.CoroutineContextProvider
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class SearchViewModel @Inject constructor(
+class SearchViewModel @ViewModelInject constructor(
     private val searchDao: SearchDao,
     private val contextProvider: CoroutineContextProvider
 ): ViewModel() {

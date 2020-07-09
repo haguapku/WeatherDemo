@@ -1,20 +1,16 @@
 package com.example.weatherdemo.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.*
 import com.example.weatherdemo.data.WeatherRepository
 import com.example.weatherdemo.data.model.WeatherResponse
 import com.example.weatherdemo.db.WeatherDao
 import com.example.weatherdemo.util.CoroutineContextProvider
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class WeatherViewModel @Inject constructor(
+class WeatherViewModel @ViewModelInject constructor(
     private val weatherRepository: WeatherRepository,
     private val weatherDao: WeatherDao,
     private val contextProvider: CoroutineContextProvider): ViewModel() {
