@@ -1,11 +1,9 @@
 package com.example.weatherdemo.data.model
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.example.weatherdemo.util.WeatherListDataConverter
 
+@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity
 data class WeatherInfo(
     val dt: Long,
