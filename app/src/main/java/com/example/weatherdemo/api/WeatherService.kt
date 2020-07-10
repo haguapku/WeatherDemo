@@ -43,7 +43,7 @@ interface WeatherService {
             val cache = Cache(File(WeatherApplication.instance.cacheDir, "httpCache"), (1024 * 1024 * 100).toLong())
             return OkHttpClient.Builder()
                 .cache(cache)
-                .addInterceptor(BaseIntercepter())
+                .addInterceptor(BaseInterceptor())
                 .addNetworkInterceptor(HttpCacheInterceptor())
                 .readTimeout(10, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)

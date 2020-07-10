@@ -4,7 +4,7 @@ import com.example.weatherdemo.util.NetWorkUtil
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class BaseIntercepter: Interceptor {
+class BaseInterceptor: Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
@@ -13,10 +13,9 @@ class BaseIntercepter: Interceptor {
             val maxStale = 28 * 24 * 60 * 60
             request = request.newBuilder()
                 .removeHeader("Pragma")
-                .header("Cache-Control", "public, only-if-cached, max-stale=" + maxStale)
+                .header("Cache-Control", "public, only-if-cached, max-stale=$maxStale")
                 .build()
         }
-        val response = chain.proceed(request)
-        return response
+        return chain.proceed(request)
     }
 }
