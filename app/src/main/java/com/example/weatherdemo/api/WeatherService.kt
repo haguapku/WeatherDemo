@@ -1,11 +1,13 @@
 package com.example.weatherdemo.api
 
+import android.content.Context
 import com.example.weatherdemo.BuildConfig
 import com.example.weatherdemo.WeatherApplication
 import com.example.weatherdemo.data.model.WeatherResponse
 import io.reactivex.Single
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -36,18 +38,21 @@ interface WeatherService {
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(createOkHttpClient())
+            .client(createOkHttpClient(WeatherApplication.instance))
             .build().create(WeatherService::class.java)
 
-        private fun createOkHttpClient(): OkHttpClient {
-            val cache = Cache(File(WeatherApplication.instance.cacheDir, "httpCache"), (1024 * 1024 * 100).toLong())
-            return OkHttpClient.Builder()
+        fun createOkHttpClient(context: Context): OkHttpClient {
+            val cache = Cache(File(context.cacheDir, "httpCache"), (1024 * 1024 * 100).toLong())
+            val builder = OkHttpClient.Builder()
                 .cache(cache)
-                .addInterceptor(BaseInterceptor())
+                .addInterceptor(BaseInterceptor(context))
                 .addNetworkInterceptor(HttpCacheInterceptor())
                 .readTimeout(10, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
-                .build()
+            if (BuildConfig.DEBUG) {
+                builder.addInterceptor(HttpLoggingInterceptor().apply { this.level = HttpLoggingInterceptor.Level.BODY })
+            }
+            return builder.build()
         }
     }
 
