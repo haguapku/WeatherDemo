@@ -58,6 +58,10 @@ android {
         jvmTarget = "1.8"
     }
 
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
 }
 
 dependencies {
@@ -93,6 +97,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$gsonConverterVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$rxjava2AdapterVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpMockWebServerVersion"
 
     // Glide dependency
@@ -118,12 +123,23 @@ dependencies {
     // JUnit 4 framework
     testImplementation "junit:junit:$junitVersion"
     // Robolectric environment
-    testImplementation "androidx.test:core:$robolectricVersion"
+    testImplementation "androidx.test:core:$androidXTestCoreVersion"
+    testImplementation "androidx.test.ext:junit-ktx:$junitKtxVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
     // Mockito framework
     testImplementation "org.mockito:mockito-core:$mockitoCoreVersion"
 
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
 
+    testImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+
     androidTestImplementation "androidx.test:runner:$androidTestVersion"
+    androidTestImplementation "androidx.test:rules:$androidTestVersion"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$junitKtxVersion"
+
+    // Optional -- Hamcrest library
+    androidTestImplementation 'org.hamcrest:hamcrest-library:2.2'
+    // Optional -- UI testing with Espresso
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }
