@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        weatherViewModel.snackbar.observe(this, Observer { text ->
+        weatherViewModel.snackBar.observe(this, Observer { text ->
             text?.let {
                 Snackbar.make(rootLayout, it, Snackbar.LENGTH_SHORT).show()
                 weatherViewModel.onSnackbarShown()

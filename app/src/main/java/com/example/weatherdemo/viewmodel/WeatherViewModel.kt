@@ -17,7 +17,7 @@ class WeatherViewModel @ViewModelInject constructor(
 
     private val _snackBar = MutableLiveData<String>()
 
-    val snackbar: LiveData<String>
+    val snackBar: LiveData<String>
         get() = _snackBar
 
     val weatherLivaData: LiveData<WeatherResponse> by lazy(LazyThreadSafetyMode.NONE) {
@@ -36,7 +36,7 @@ class WeatherViewModel @ViewModelInject constructor(
 
         return launchDataLoad {
             withContext(contextProvider.IO) {
-                var weatherResponse = weatherRepository.getWeatherByCityName(name)
+                val weatherResponse = weatherRepository.getWeatherByCityName(name)
                 if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
@@ -48,7 +48,7 @@ class WeatherViewModel @ViewModelInject constructor(
 
         return launchDataLoad {
             withContext(contextProvider.IO) {
-                var weatherResponse = weatherRepository.getWeatherByZipCode(name)
+                val weatherResponse = weatherRepository.getWeatherByZipCode(name)
                 if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
@@ -60,7 +60,7 @@ class WeatherViewModel @ViewModelInject constructor(
 
         return launchDataLoad {
             withContext(contextProvider.IO) {
-                var weatherResponse = weatherRepository.getWeatherByCoordinates(lat, lon)
+                val weatherResponse = weatherRepository.getWeatherByCoordinates(lat, lon)
                 if (weatherResponse.isSuccessful && weatherResponse.body()!!.cod == "200") {
                     weatherDao.insertWeather(weatherResponse.body()!!)
                 }
