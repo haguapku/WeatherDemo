@@ -42,6 +42,9 @@ class WeatherServiceTest {
     private val testDispatcher = TestCoroutineDispatcher()
     private val testScope = TestCoroutineScope(testDispatcher)
 
+    private val latitude = -33.8F
+    private val longitude = 151.0833F
+
     @Before
     fun setup() {
 
@@ -74,7 +77,7 @@ class WeatherServiceTest {
         Timber.i(readFileFromPath())
         mockWebServer.enqueue(response)
 
-        val weatherResponse = weatherService.getWeatherByCoordinates(-33.8F, 151.0833F)
+        val weatherResponse = weatherService.getWeatherByCoordinates(latitude, longitude)
 
         assertThat(weatherResponse.isSuccessful, `is`(true))
         assertThat(weatherResponse.body()?.city?.name, `is`("Eastwood"))
