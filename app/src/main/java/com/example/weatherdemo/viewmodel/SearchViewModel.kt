@@ -51,7 +51,7 @@ class SearchViewModel @ViewModelInject constructor(
 
     fun deleteAll() = viewModelScope.launch {
         withContext(contextProvider.IO) {
-            searchDao.deleteall()
+            searchDao.deleteAll()
         }
     }
 }

@@ -37,7 +37,7 @@ interface SearchDao {
     fun deleteCheckedCity(checked: Boolean)
 
     @Query("delete from item_table")
-    fun deleteall()
+    fun deleteAll()
 }
 
 @Database(entities = [WeatherResponse::class, WeatherInfo::class, City::class, Coord::class, SearchHistoryItem::class], version = 2, exportSchema = false)

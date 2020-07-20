@@ -5,7 +5,9 @@ import com.example.weatherdemo.data.model.WeatherResponse
 import com.example.weatherdemo.util.readFileFromPath
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -13,6 +15,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 import retrofit2.Response
 
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class WeatherRepositoryTest {
 
@@ -25,7 +28,7 @@ class WeatherRepositoryTest {
     private lateinit var mockService: WeatherService
 
     @Test
-    fun getWeatherByCoordinatesTest() = runBlocking {
+    fun getWeatherByCoordinatesTest() = runBlockingTest {
 
         `when` (mockService.getWeatherByCoordinates(latitude, longitude)).thenReturn(mockResponse)
         val weatherRepository = WeatherRepository(mockService)
