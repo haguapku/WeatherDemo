@@ -1,15 +1,10 @@
 package com.example.weatherdemo.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.example.weatherdemo.TestContextProvider
 import com.example.weatherdemo.TestCoroutineRule
 import com.example.weatherdemo.WeatherDaoFake
-import com.example.weatherdemo.api.WeatherService
 import com.example.weatherdemo.data.WeatherRepository
-import com.example.weatherdemo.data.model.City
-import com.example.weatherdemo.data.model.Coord
-import com.example.weatherdemo.data.model.WeatherInfo
 import com.example.weatherdemo.data.model.WeatherResponse
 import com.example.weatherdemo.util.getOrWaitValue
 import com.example.weatherdemo.util.readFileFromPath
@@ -20,9 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import retrofit2.Response
 
