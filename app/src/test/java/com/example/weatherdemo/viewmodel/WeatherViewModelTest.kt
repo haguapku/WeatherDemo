@@ -11,12 +11,18 @@ import com.example.weatherdemo.data.model.City
 import com.example.weatherdemo.data.model.Coord
 import com.example.weatherdemo.data.model.WeatherInfo
 import com.example.weatherdemo.data.model.WeatherResponse
+import com.example.weatherdemo.util.getOrWaitValue
+import com.example.weatherdemo.util.readFileFromPath
+import com.google.common.truth.Truth.assertThat
+import com.google.gson.Gson
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import retrofit2.Response
 
@@ -31,73 +37,45 @@ class WeatherViewModelTest {
 
     private lateinit var weatherViewModel: WeatherViewModel
 
+    @Mock
     private lateinit var weatherRepository: WeatherRepository
 
     private lateinit var weatherResponse: WeatherResponse
 
-    @Mock
-    private lateinit var weatherResultObserver: Observer<WeatherResponse>
+//    @Mock
+//    private lateinit var weatherResultObserver: Observer<WeatherResponse>
 
-    @Mock
-    private lateinit var weatherService: WeatherService
+    private val latitude = -33.8F
+    private val longitude = 151.0833F
 
     @Before
     fun setup() {
-        weatherRepository = WeatherRepository(weatherService)
-        weatherResponse =  WeatherResponse(
-            "200",
-            "0",
-            0,
-            emptyList<WeatherInfo>(),
-            City(
-                2167280,
-                "Epping",
-                Coord(
-                    1.1,
-                    1.1),
-                "AU",
-                18969,
-                39600,
-                1582400260,
-                1582447261))
+        weatherResponse = Gson().fromJson(readFileFromPath(), WeatherResponse::class.java)
         weatherViewModel = WeatherViewModel(
             weatherRepository,
             WeatherDaoFake(weatherResponse),
             TestContextProvider()
         ).apply {
-            weatherLivaData.observeForever(weatherResultObserver)
+//            weatherLivaData.observeForever(weatherResultObserver)
         }
     }
 
     @Test
-    fun loadWeatherByName_fetchFromServer_returnProperData() {
+    fun loadWeatherByCoordinates_returnSuccessfulData() {
 
         testCoroutineRule.runBlockingTest {
 
             // Given
             val response = Response.success(weatherResponse)
-            Mockito.`when`(weatherService.getWeatherByCityName("Epping")).thenReturn(response)
-            val weatherInfoResponse =  WeatherResponse(
-                "200",
-                "0",
-                0,
-                emptyList<WeatherInfo>(),
-                City(
-                    2167280,
-                    "Epping",
-                    Coord(
-                        1.1,
-                        1.1),
-                    "AU",
-                    18969,
-                    39600,
-                    1582400260,
-                    1582447261))
+            `when`(weatherRepository.getWeatherByCoordinates(latitude, longitude)).thenReturn(response)
+
             // When
-            weatherViewModel.getWeatherByCityName("Epping")
+            weatherViewModel.getWeatherByCoordinates(latitude, longitude)
 
             // Then
-            Mockito.verify(weatherResultObserver).onChanged(weatherInfoResponse)
+            assertThat(weatherViewModel.weatherLivaData.getOrWaitValue {  }).isNotNull()
+            assertThat(weatherViewModel.weatherLivaData.getOrWaitValue {  }).isEqualTo(weatherResponse)
+//            verify(weatherResultObserver).onChanged(weatherResponse)
 
         }
     }

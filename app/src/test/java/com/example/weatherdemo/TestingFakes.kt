@@ -14,11 +14,6 @@ import kotlinx.coroutines.sync.withLock
 
 class WeatherDaoFake(var weatherToReturn: WeatherResponse) : WeatherDao {
 
-    val data = emptyList<WeatherInfo>()
-    val coord = Coord(0.0, 0.0)
-    val city = City(0, "", coord, "", 0, 0, 0, 0)
-    val inserted =  WeatherResponse("0", "0", 0, data, city)
-
     /**
      * This is used to signal an element has been inserted.
      */
@@ -33,7 +28,7 @@ class WeatherDaoFake(var weatherToReturn: WeatherResponse) : WeatherDao {
         runBlocking {
             mutex.withLock {
                 // complete the waiting deferred
-                nextInsertion?.complete(inserted)
+                nextInsertion?.complete(weatherResponse)
             }
         }
     }
