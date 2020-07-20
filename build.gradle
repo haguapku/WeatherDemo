@@ -48,6 +48,7 @@ ext{
     mockitoCoreVersion = '3.2.4'
     mockitoAndroidVersion = '2.13.0'
     androidXTestCoreVersion = '1.2.0'
+    androidXCoreTestingVersion = '2.1.0'
     androidTestVersion = '1.2.0'
     robolectricVersion = '4.3.1'
     espressoVersion = '3.2.0'

@@ -134,6 +134,7 @@ dependencies {
     testImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
 
+    androidTestImplementation "androidx.arch.core:core-testing:$androidXCoreTestingVersion"
     androidTestImplementation "androidx.test:runner:$androidTestVersion"
     androidTestImplementation "androidx.test:rules:$androidTestVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$junitKtxVersion"
