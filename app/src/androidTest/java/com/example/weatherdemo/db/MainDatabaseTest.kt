@@ -2,9 +2,9 @@ package com.example.weatherdemo.db
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.weatherdemo.data.model.WeatherResponse
 import com.example.weatherdemo.util.getOrWaitValueInstrumented
 import com.google.common.truth.Truth.assertThat
@@ -14,9 +14,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito.verify
+import org.mockito.junit.MockitoJUnitRunner
 import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(MockitoJUnitRunner::class)
 class MainDatabaseTest {
 
     private lateinit var weatherDao: WeatherDao
@@ -24,6 +27,9 @@ class MainDatabaseTest {
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
+
+    @Mock
+    private lateinit var observer: Observer<WeatherResponse>
 
     @Before
     fun createDb() {
@@ -43,9 +49,13 @@ class MainDatabaseTest {
     fun insertWeatherAndReadWeatherTest() {
 
         val weatherResponse = Gson().fromJson<WeatherResponse>(this::class.java.getResource("/test.json")?.readText(), WeatherResponse::class.java)
-        val responseAsLiveData = weatherDao.loadWeather()
+//        val responseAsLiveData = weatherDao.loadWeather()
+//        weatherDao.insertWeather(weatherResponse)
+//        val response = responseAsLiveData.getOrWaitValueInstrumented {  }
+//        assertThat(response).isEqualTo(weatherResponse)
+
+        weatherDao.loadWeather().apply { this.observeForever(observer) }
         weatherDao.insertWeather(weatherResponse)
-        val response = responseAsLiveData.getOrWaitValueInstrumented {  }
-        assertThat(response).isEqualTo(weatherResponse)
+        verify(observer).onChanged(weatherResponse)
     }
 }
