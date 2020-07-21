@@ -29,7 +29,7 @@
             app:weatherIcon="@{`http://openweathermap.org/img/wn/` + weatherInfo.weather[0].icon + `@2x.png`}"/>
 
         <TextView
-            android:id="@+id/weather_day"
+            android:id="@+id/item_weather_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_20"
@@ -46,7 +46,7 @@
             app:layout_constraintTop_toTopOf="@id/item_weather_icon"/>
 
         <TextView
-            android:id="@+id/weather_date"
+            android:id="@+id/item_weather_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_20"
@@ -57,10 +57,10 @@
             android:textStyle="bold"
             app:dateOfWeek="@{weatherInfo.dt}"
             app:layout_constraintStart_toEndOf="@+id/item_weather_icon"
-            app:layout_constraintTop_toBottomOf="@id/weather_day"/>
+            app:layout_constraintTop_toBottomOf="@id/item_weather_day"/>
 
         <TextView
-            android:id="@+id/weather_temp_max"
+            android:id="@+id/item_weather_temp_max"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_20"
@@ -77,7 +77,7 @@
             app:layout_constraintTop_toTopOf="@id/item_weather_icon"/>
 
         <TextView
-            android:id="@+id/weather_temp_min"
+            android:id="@+id/item_weather_temp_min"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_20"
@@ -90,10 +90,11 @@
             android:textStyle="bold"
             android:textColor="@color/grey"
             app:tempText="@{weatherInfo.temp.min}"
-            app:layout_constraintEnd_toStartOf="@+id/weather_temp_max"
+            app:layout_constraintEnd_toStartOf="@+id/item_weather_temp_max"
             app:layout_constraintTop_toTopOf="@id/item_weather_icon"/>
 
         <ImageView
+            android:id="@+id/item_drops_image"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginStart="@dimen/margin_20"
@@ -116,6 +117,6 @@
             android:textStyle="bold"
             app:rainPrecipitation="@{weatherInfo.rain}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/weather_temp_max"/>
+            app:layout_constraintTop_toBottomOf="@id/item_weather_temp_max"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
