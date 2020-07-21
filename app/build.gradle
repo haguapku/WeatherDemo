@@ -86,7 +86,6 @@ dependencies {
     // Architecture components: ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$androidLifecycleVersion"
-    testImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
 
     // Room for database
     implementation "androidx.room:room-runtime:$roomVersion"
@@ -122,23 +121,25 @@ dependencies {
 
     // JUnit 4 framework
     testImplementation "junit:junit:$junitVersion"
+    testImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
     // Robolectric environment
     testImplementation "androidx.test:core:$androidXTestCoreVersion"
     testImplementation "androidx.test.ext:junit-ktx:$junitKtxVersion"
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
     // Mockito framework
     testImplementation "org.mockito:mockito-core:$mockitoCoreVersion"
-    androidTestImplementation "org.mockito:mockito-android:$mockitoCoreVersion"
-
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
-
     testImplementation "com.google.truth:truth:$truthVersion"
-    androidTestImplementation "com.google.truth:truth:$truthVersion"
 
+    androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$androidXCoreTestingVersion"
+    androidTestImplementation 'androidx.test:core-ktx:1.2.0'
     androidTestImplementation "androidx.test:runner:$androidTestVersion"
     androidTestImplementation "androidx.test:rules:$androidTestVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$junitKtxVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoCoreVersion"
 
     // Optional -- Hamcrest library
     androidTestImplementation 'org.hamcrest:hamcrest-library:2.2'
