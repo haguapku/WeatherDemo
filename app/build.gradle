@@ -8,6 +8,19 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'dagger.hilt.android.plugin'
 
+// Set the versionName and versionCode from version.properties file
+file("version.properties").withReader {reader ->
+    println '[ INFO ] Loading Application version information ......'
+
+    def versionProperties = new Properties()
+    versionProperties.load(reader)
+    android.defaultConfig.versionName = versionProperties.get("VERSION")
+    android.defaultConfig.versionCode = Integer.valueOf(versionProperties.get("BUILD"))
+
+    println '[ INFO ] Version Name: ' + android.defaultConfig.versionName
+    println '[ INFO ] Version Code: ' + android.defaultConfig.versionCode
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -15,8 +28,6 @@ android {
         applicationId "com.example.weatherdemo"
         minSdkVersion 15
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -145,4 +156,22 @@ dependencies {
     androidTestImplementation 'org.hamcrest:hamcrest-library:2.2'
     // Optional -- UI testing with Espresso
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+}
+
+android.applicationVariants.all { variant ->
+    def apkName = 'weather'
+    def flavorName = variant.flavorName
+    apkName += "-v" + android.defaultConfig.versionName + "-Build-" + android.defaultConfig.versionCode + "-" + flavorName
+    if (!variant.buildType.zipAlignEnabled) {
+        apkName += "-unaligned"
+    }
+    if (variant.buildType.name == "release") {
+        apkName += "-RELEASE.apk"
+    } else {
+        apkName += "-DEBUG.apk"
+    }
+
+    variant.outputs.all {
+        outputFileName = apkName
+    }
 }
