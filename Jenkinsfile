@@ -69,7 +69,7 @@ pipeline {
               if (currentBuild.result == null
                   || currentBuild.result == 'SUCCESS') {
               // Start your emulator, testing tools
-              sh 'emulator @Nexus_Emulator_API_24'
+              sh './emulator @Nexus_Emulator_API_24'
               sh 'appium &'
 
               // You're set to go, now execute your UI test
