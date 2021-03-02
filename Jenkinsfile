@@ -89,7 +89,6 @@ pipeline {
               throw error
           }
         }
-        currentBuild.result = "SUCCESS"
 
     stage('Build APK') {
           steps {
