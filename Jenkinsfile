@@ -106,8 +106,10 @@ pipeline {
 
           sh './gradlew connectedDevDebugAndroidTest'
 
-          sh './adb emu kill'
-
+          sh """
+              cd ${PLATFORM_TOOL_DIRECTORY}
+              ./adb emu kill
+             """
         }
     }
 
