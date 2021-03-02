@@ -31,7 +31,13 @@ def isDeployCandidate() {
     return ("${env.BRANCH_NAME}" =~ /(develop|master)/)
 }
 
-def ADB="$ANDROID_HOME/platform-tools/adb"
+// -- Directory where the Platform Tools is located
+def PLATFORM_TOOL_DIRECTORY = "$ANDROID_HOME/platform-tools/"
+
+// -- Directory where the Android Emulator is located
+def EMULATOR_DIRECTORY = "$ANDROID_HOME/emulator/"
+
+dev JOB_DEVICE_NAME = "@Pixel_4_API_29"
 
 pipeline {
     agent any
@@ -68,14 +74,37 @@ pipeline {
     stage('UI Tests') {
 
         steps {
-          sh "$ADB start-server"
+          echo "Executing ADB Server"
+          // -- First, you need to go to the Platform Tool Directory.
+          // -- Then run the ADB Server
+          script {
+              try {
+                  sh """
+                      cd ${PLATFORM_TOOL_DIRECTORY}
+                      ./adb start-server&
+                     """
+              } catch (err) {
+                      echo "The ADB Server is not running"
+              }
+          }
 
-          sh "$ANDROID_HOME/tools/qemu/darwin-x86_64/qemu-system-i386 -engine classic -prop persist.sys.language=en -prop persist.sys.country=US -avd test -no-snapshot-load -no-snapshot-save -no-window"
+          echo "Starting Emulator"
+          // -- First, you need to go to the Emulator Directory.
+          // -- Then launch the Emulator
+          script {
+              try {
+                  sh """
+                      cd ${EMULATOR_DIRECTORY}
+                      ./emulator -avd ${JOB_DEVICE_NAME} -engine auto -wipe-data -no-cache -memory 3072 -no-snapshot-save&
+                      sleep 60s
+                     """
+              } catch (err) {
+                      echo "The emulator is not open"
+              }
 
-          timeout(time: 20, unit: 'SECONDS') {
-                  sh "$ADB wait-for-device"
-                }
-          sh "./gradlew :MyKet:connectedAndroidTest"
+          }
+
+          sh "./gradlew connectedDevDebugAndroidTest"
 
           sh script: '/var/lib/jenkins/kill-emu.sh'
 
