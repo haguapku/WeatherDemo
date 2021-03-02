@@ -96,7 +96,7 @@ pipeline {
                   sh """
                       cd ${EMULATOR_DIRECTORY}
                       ./emulator ${JOB_DEVICE_NAME} -engine auto -wipe-data -no-cache -memory 3072 -no-snapshot-save&
-                      sleep 60s
+                      sleep 120s
                      """
               } catch (err) {
                       echo "The emulator is not open"
@@ -104,9 +104,9 @@ pipeline {
 
           }
 
-          sh "./gradlew connectedDevDebugAndroidTest"
+          sh './gradlew connectedDevDebugAndroidTest'
 
-          sh script: '/var/lib/jenkins/kill-emu.sh'
+          sh './adb emu kill'
 
         }
     }
