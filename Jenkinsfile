@@ -66,6 +66,8 @@ pipeline {
         }
 
     stage('UI Tests') {
+
+        steps {
           sh "$ADB start-server"
 
           def error
@@ -89,6 +91,7 @@ pipeline {
               throw error
           }
         }
+    }
 
     stage('Build APK') {
           steps {
