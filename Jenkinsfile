@@ -70,26 +70,15 @@ pipeline {
         steps {
           sh "$ADB start-server"
 
-          def error
-          parallel (
-            launchEmulator: {
-                sh "$ANDROID_HOME/tools/qemu/linux-x86_64/qemu-system-x86_64 -engine classic -prop persist.sys.language=en -prop persist.sys.country=US -avd test -no-snapshot-load -no-snapshot-save -no-window"
-            },
-            runAndroidTests: {
-                timeout(time: 20, unit: 'SECONDS') {
+          sh "$ANDROID_HOME/tools/qemu/linux-x86_64/qemu-system-x86_64 -engine classic -prop persist.sys.language=en -prop persist.sys.country=US -avd test -no-snapshot-load -no-snapshot-save -no-window"
+
+          timeout(time: 20, unit: 'SECONDS') {
                   sh "$ADB wait-for-device"
                 }
-                try {
-                    sh "./gradlew :MyKet:connectedAndroidTest"
-                } catch(e) {
-                    error = e
-                }
-                sh script: '/var/lib/jenkins/kill-emu.sh'
-            }
-          )
-          if (error != null) {
-              throw error
-          }
+          sh "./gradlew :MyKet:connectedAndroidTest"
+
+          sh script: '/var/lib/jenkins/kill-emu.sh'
+
         }
     }
 
