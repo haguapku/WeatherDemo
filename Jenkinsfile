@@ -70,7 +70,7 @@ pipeline {
         steps {
           sh "$ADB start-server"
 
-          sh "$ANDROID_HOME/tools/qemu/linux-x86_64/qemu-system-x86_64 -engine classic -prop persist.sys.language=en -prop persist.sys.country=US -avd test -no-snapshot-load -no-snapshot-save -no-window"
+          sh "$ANDROID_HOME/tools/qemu/darwin-x86_64/qemu-system-x86_64 -engine classic -prop persist.sys.language=en -prop persist.sys.country=US -avd test -no-snapshot-load -no-snapshot-save -no-window"
 
           timeout(time: 20, unit: 'SECONDS') {
                   sh "$ADB wait-for-device"
