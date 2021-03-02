@@ -51,7 +51,7 @@ class MainActivityTest{
         onView(withId(R.id.weather_wind)).check(matches(isDisplayed()))
         onView(withId(R.id.weather_today)).check(matches(isDisplayed()))
         onView(withId(R.id.weather_icon)).check(matches(isDisplayed()))
-        onView(withId(R.id.weather_desc)).check(matches(isDisplayed()))
+//        onView(withId(R.id.weather_desc)).check(matches(isDisplayed()))
         onView(withId(R.id.weather_temp_max)).check(matches(isDisplayed()))
         onView(withId(R.id.weather_temp_min)).check(matches(isDisplayed()))
 
