@@ -95,7 +95,7 @@ pipeline {
               try {
                   sh """
                       cd ${EMULATOR_DIRECTORY}
-                      ./emulator -avd ${JOB_DEVICE_NAME} -engine auto -wipe-data -no-cache -memory 3072 -no-snapshot-save&
+                      ./emulator ${JOB_DEVICE_NAME} -engine auto -wipe-data -no-cache -memory 3072 -no-snapshot-save&
                       sleep 60s
                      """
               } catch (err) {
