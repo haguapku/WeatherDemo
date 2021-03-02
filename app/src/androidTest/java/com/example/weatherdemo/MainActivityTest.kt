@@ -7,10 +7,13 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import androidx.test.rule.GrantPermissionRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.security.Permission
+import java.util.jar.Manifest
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest{
@@ -20,6 +23,14 @@ class MainActivityTest{
     @get:Rule
     var activityRule: ActivityTestRule<MainActivity>
             = ActivityTestRule(MainActivity::class.java)
+
+    @get:Rule
+    var grantCoarseLocationPermissionRule: GrantPermissionRule
+            = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+    @get:Rule
+    var grantFineLocationPermissionRule: GrantPermissionRule
+            = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     @Before
     fun initValidString() {
