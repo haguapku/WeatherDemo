@@ -37,7 +37,7 @@ def PLATFORM_TOOL_DIRECTORY = "$ANDROID_HOME/platform-tools/"
 // -- Directory where the Android Emulator is located
 def EMULATOR_DIRECTORY = "$ANDROID_HOME/emulator/"
 
-dev JOB_DEVICE_NAME = "@Pixel_4_API_29"
+def JOB_DEVICE_NAME = "@Pixel_4_API_29"
 
 pipeline {
     agent any
