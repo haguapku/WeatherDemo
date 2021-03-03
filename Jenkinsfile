@@ -31,6 +31,14 @@ def isDeployCandidate() {
     return ("${env.BRANCH_NAME}" =~ /(develop|master)/)
 }
 
+// -- Directory where the Platform Tools is located
+def PLATFORM_TOOL_DIRECTORY = "$ANDROID_HOME/platform-tools/"
+
+// -- Directory where the Android Emulator is located
+def EMULATOR_DIRECTORY = "$ANDROID_HOME/emulator/"
+
+def JOB_DEVICE_NAME = "@Pixel_4_API_29"
+
 pipeline {
     agent any
 
@@ -53,7 +61,7 @@ pipeline {
           }
         }
 
-    stage('Unit test') {
+    stage('Unit Test') {
           steps {
             // Compile and run the unit tests for the app and its dependencies
             sh './gradlew testDevDebugUnitTest'
@@ -63,20 +71,47 @@ pipeline {
           }
         }
 
-    stage('UI Testing') {
-          steps {
-            script {
-              if (currentBuild.result == null
-                  || currentBuild.result == 'SUCCESS') {
-              // Start your emulator, testing tools
-              sh 'emulator @Nexus_Emulator_API_24
-              sh 'appium &'
+    stage('UI Test') {
 
-              // You're set to go, now execute your UI test
-              sh 'rspec spec -fd'
+        steps {
+          echo "Executing ADB Server"
+          // -- First, you need to go to the Platform Tool Directory.
+          // -- Then run the ADB Server
+          script {
+              try {
+                  sh """
+                      cd ${PLATFORM_TOOL_DIRECTORY}
+                      ./adb start-server&
+                     """
+              } catch (err) {
+                      echo "The ADB Server is not running"
               }
-            }
           }
+
+          echo "Starting Emulator"
+          // -- First, you need to go to the Emulator Directory.
+          // -- Then launch the Emulator
+          script {
+              try {
+                  sh """
+                      cd ${EMULATOR_DIRECTORY}
+                      ./emulator ${JOB_DEVICE_NAME} -engine auto -wipe-data -no-cache -memory 3072 -no-snapshot-save&
+                      sleep 120s
+                     """
+              } catch (err) {
+                      echo "The emulator is not open"
+              }
+
+          }
+
+          sh './gradlew connectedDevDebugAndroidTest'
+
+          sh """
+              cd ${PLATFORM_TOOL_DIRECTORY}
+              ./adb emu kill
+             """
+        }
+    }
 
     stage('Build APK') {
           steps {
